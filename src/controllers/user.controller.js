@@ -57,7 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "something went wrong")
     }
     const token = await getAccessToken(user._id);
-    user.accessToken=token;
+    user.accessToken = token;
 
     user.save();
 
@@ -71,15 +71,15 @@ const registerUser = asyncHandler(async (req, res) => {
           <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
           <a href=http://localhost:8000/api/v1/users/verifyEmail/${token}> Click here</a>
           </div>`,
-      };
-      
-      sgMail
+    };
+
+    sgMail
         .send(msg)
         .then((result) => {
-          console.log(result);
+            console.log(result);
         })
         .catch((error) => {
-          console.error(error);
+            console.error(error);
         });
 
 
@@ -88,18 +88,18 @@ const registerUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, createdUser, "user registered successfully"))
 })
 
-const verifyEmail=asyncHandler(async(req,res)=>{
+const verifyEmail = asyncHandler(async (req, res) => {
     let { accessToken } = req.query;
 
-    const user = await User.findOne({accessToken }).select("-password");
+    const user = await User.findOne({ accessToken }).select("-password");
 
-        if (!user) {
-            // If user with the provided token is not found, return an error
-            return res.status(404).json({ message: 'User not found' });
-        }
+    if (!user) {
+        // If user with the provided token is not found, return an error
+        return res.status(404).json({ message: 'User not found' });
+    }
 
-        // If user is found, return success message
-        return res.status(200).json(new ApiResponse(200,{user},"user registered successfully"));
+    // If user is found, return success message
+    return res.status(200).json(new ApiResponse(200, { user }, "user registered successfully"));
 })
 
 
@@ -119,7 +119,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const token = await getAccessToken(user._id);
-    user.accessToken=token;
+    user.accessToken = token;
     user.save();
 
     const loggedInUser = await User.findById(user._id).
@@ -140,7 +140,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 "User logged in Successfully"
             )
         )
-    
+
 })
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -165,7 +165,7 @@ const getOrders = asyncHandler(async (req, res) => {
         userId,
         createdAt: { $gte: last24Hours }
     }).select("-userId");
-    
+
     return res.json({ orders });
 })
 
@@ -203,12 +203,17 @@ const getUsers = asyncHandler(async (req, res) => {
 
     users.forEach(user => {
         const userOrders = orders.filter(order => order.userId.equals(user._id));
-        user.orders.push(...userOrders.map(order =>order));
+        user.orders.push(...userOrders.map(order => ({
+            _id: order._id,
+            // items:order.items,
+            // description: order.description,
+            // price: order.price,
+        })));
     });
-    
+
     return res
         .status(200)
-        .json(new ApiResponse(200, {users, ordersPlaced }, "user and orders successfully returned."))
+        .json(new ApiResponse(200, { users, ordersPlaced }, "user and orders successfully returned."))
 })
 
 export {

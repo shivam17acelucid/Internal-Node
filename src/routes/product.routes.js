@@ -5,9 +5,10 @@ import {
     getOrdersBetweenDates
 
 } from "../controllers/product.controller.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
-router.route("/buyProducts").post(buyProduct)
+router.route("/buyProducts").post(verifyJWT,buyProduct)
 router.route("/getProductsSoldLastDay").get(getProductsSoldLastDay)
 router.route("/getOrdersBetweenDates").get(getOrdersBetweenDates)
 

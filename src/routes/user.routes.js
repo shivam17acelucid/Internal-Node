@@ -16,8 +16,8 @@ router.route("/login").post(loginUser)
 router.route("/logout").post(verifyJWT,logoutUser)
 router.route("/verifyEmail").post(verifyEmail)
 
-router.route("/getOrdersOfSpecificUser").get(getOrders)
-router.route("/getUserWhoPlacedOrder").get(getUsers);
+router.route("/getOrdersOfSpecificUser").get(verifyJWT,getOrders)
+router.route("/getUserWhoPlacedOrder").get(verifyJWT,getUsers);
 
 
 
