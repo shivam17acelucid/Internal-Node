@@ -2,10 +2,69 @@ import express from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser"
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
+
+const app=express();
+// import swagger from 'swagger-jsdoc'
+// import 
+// const swaggerJSDoc=require('swagger-jsdoc')
+// const swaggerUi=require('swagger-ui-express')
+
 
 // const bodyParser = require('body-parser');
 
-const app=express();
+
+// const options={
+//     defination:{
+//         openapi:'3.0.0',
+//         info:{
+//             titile:'Node Js Project for Mongodb',
+//             version:'1.0.0'
+//         },
+        // servers:[
+        //     {
+        //         api:'http://localhost:8000/'
+        //     }
+        // ]
+//     },
+//     apis:['./']
+// }
+
+// const swaggerSpec=swaggerJSDoc(options)
+const options = {
+    swaggerDefinition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'Your API Documentation',
+        version: '1.0.0',
+        description: 'Description of your API',
+      },
+      servers:[
+        {
+            url:'http://localhost:8000/'
+        }
+    ]
+    },
+    apis: ['./routes/*.js'], // Path to the API routes
+  };
+  
+  const swaggerSpec = swaggerJSDoc(options);
+
+app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
+
+/**
+ * @swagger
+ * /:
+ * get:
+ *      summary:This api is used to check if get method is working or not
+ *      desc:this is api is used to check if get method is working or not
+ *      res:
+ *          200:
+ *              desc:Successfull
+ */
+
 app.use(bodyParser.json());
 app.use(cors({
     origin:process.env.CORS_ORIGIN,
@@ -23,6 +82,7 @@ app.use(cookieParser())
 
 import userRouter from "./routes/user.routes.js"
 import productRouter from "./routes/product.routes.js"
+import { version } from "mongoose";
 
 //router declaration
 app.use("/api/v1/users",userRouter)

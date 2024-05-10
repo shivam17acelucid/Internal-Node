@@ -4,6 +4,10 @@ import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
+import { translate } from "bing-translate-api";
+
+
+
 
 const buyProduct = asyncHandler(async (req, res) => {
 
@@ -26,6 +30,7 @@ const buyProduct = asyncHandler(async (req, res) => {
 
         // Add the item to the order
         // order.price+=product.price*quantity;
+
         totalPrice += product.price * quantity;
         order.items.push({ productId, quantity });
     }
@@ -99,8 +104,49 @@ const getOrdersBetweenDates = asyncHandler(async (req, res) => {
     return res.status(200).json({ orders });
 
 })
+
+
+const searchProducts = asyncHandler(async (req, res) => {
+    const { word, language } = req.query;
+    console.log(language);
+
+    // Query the database for products containing the word as a substring
+    const products = await Product.find({ productName: { $regex: new RegExp(word, 'i') } });
+
+    const translatedProducts = await Promise.all(
+        products.map(async (product) => {
+            try {
+                //  console.log("product",product?.name);
+                console.log(product);
+                const translation = await translate(product.productName, null, language);
+                console.log(translation.translation);
+                if (translation) {
+                    return { ...product._doc, productName: translation.translation };
+                } else {
+                    console.error(`Error translating product name: ${product.productName}`);
+                    return product;
+                }
+            } catch (error) {
+                console.error(`Error translating product name: ${product.productName}`, error);
+                return product;
+            }
+        })
+    );
+    res.json({ products: translatedProducts });
+});
+const searchProductsInHindi = asyncHandler(async (req, res) => {
+    const { word } = req.query
+    const translation = await translate(word, null, "en");
+
+    const productName = translation.translation;
+    const products = await Product.find({ productName });
+    return res.status(200).json(new ApiResponse(products, "success"));
+})
+
 export {
     getProductsSoldLastDay,
     buyProduct,
-    getOrdersBetweenDates
+    getOrdersBetweenDates,
+    searchProducts,
+    searchProductsInHindi
 }

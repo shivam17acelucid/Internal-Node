@@ -215,7 +215,6 @@ const getUsers = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, { users, ordersPlaced }, "user and orders successfully returned."))
 })
-
 export {
     registerUser,
     loginUser,
