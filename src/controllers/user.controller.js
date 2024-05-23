@@ -23,7 +23,7 @@ const getAccessToken = async (userId) => {
 }
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { username, email, password } = req.body
+    const { username, email, password,role } = req.body
 
     if (!username) {
         throw new ApiError(400, "Username is required")
@@ -37,6 +37,10 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!password) {
         throw new ApiError(400, "Password is required")
     }
+    if (!['admin', 'vendor', 'wholesaler'].includes(role)) {
+        return res.status(400).send('Invalid role');
+      }
+
     const existedUser = await User.findOne({
         $or: [{ username }, { email }]
 
@@ -49,7 +53,8 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         username,
         password,
-        email
+        email,
+        role
     })
 
     const createdUser = await User.findById(user._id).select("-password")
@@ -192,7 +197,10 @@ const getUsers = asyncHandler(async (req, res) => {
     }).populate('userId');
 
 
-    const userIds = orders.map(order => order.userId._id);
+    const userIds = orders.map((order )=> {
+        //console.log(order);
+        order.userId?._id
+});
 
     // Fetch users associated with the orders
     const users = await User.find({ _id: { $in: userIds } }).select("-password -orders");
@@ -204,7 +212,7 @@ const getUsers = asyncHandler(async (req, res) => {
     users.forEach(user => {
         const userOrders = orders.filter(order => order.userId.equals(user._id));
         user.orders.push(...userOrders.map(order => ({
-            _id: order._id,
+             _id: order._id,
             // items:order.items,
             // description: order.description,
             // price: order.price,

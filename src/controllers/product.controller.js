@@ -6,9 +6,6 @@ import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
 import { translate } from "bing-translate-api";
 
-
-
-
 const buyProduct = asyncHandler(async (req, res) => {
 
     const { userId, items } = req.body;
@@ -27,25 +24,20 @@ const buyProduct = asyncHandler(async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: `Product with ID ${productId} not found` });
         }
-
         // Add the item to the order
         // order.price+=product.price*quantity;
-
         totalPrice += product.price * quantity;
         order.items.push({ productId, quantity });
     }
-
     // Save the order to the database
     order.price = totalPrice;
     const order1 = await order.save();
     // console.log(order1._id);
-
     await User.findByIdAndUpdate(
         userId,
         { $push: { orders: order1._id } },
         { new: true }
     );
-
     return res
         .status(200)
         .json(new ApiResponse(200, order, "Order successfully"))
@@ -104,7 +96,6 @@ const getOrdersBetweenDates = asyncHandler(async (req, res) => {
     return res.status(200).json({ orders });
 
 })
-
 
 const searchProducts = asyncHandler(async (req, res) => {
     const { word, language } = req.query;

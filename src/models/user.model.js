@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema(
             lowercase: true,
             trim: true,
         },
-        // userId:{
-        //     type:String,
-        //     required:true
-        // },
         orders: [
             {
                 type: Schema.Types.ObjectId,
@@ -38,9 +34,9 @@ const userSchema = new mongoose.Schema(
             trim: true,
             index: true
         },
-        isAdmin: {
-            type: Boolean,
-            default: false
+        role: {
+            type: String,
+            required: true
         }
     },
     {

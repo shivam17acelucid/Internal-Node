@@ -6,6 +6,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 
+
 const app=express();
 // import swagger from 'swagger-jsdoc'
 // import 
@@ -43,7 +44,7 @@ const options = {
       },
       servers:[
         {
-            url:'http://localhost:8000/'
+            url:'http://localhost:8000'
         }
     ]
     },
@@ -54,16 +55,6 @@ const options = {
 
 app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
 
-/**
- * @swagger
- * /:
- * get:
- *      summary:This api is used to check if get method is working or not
- *      desc:this is api is used to check if get method is working or not
- *      res:
- *          200:
- *              desc:Successfull
- */
 
 app.use(bodyParser.json());
 app.use(cors({
